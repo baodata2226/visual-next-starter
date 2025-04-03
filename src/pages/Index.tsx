@@ -8,6 +8,8 @@ import VideoPreview from '@/components/VideoPreview';
 import CustomSlider from '@/components/CustomSlider';
 import MediaExample from '@/components/MediaExample';
 import RandomSeed from '@/components/RandomSeed';
+import OutputVideo from '@/components/OutputVideo';
+import { Info } from 'lucide-react';
 
 const Index = () => {
   const [videoFile, setVideoFile] = useState<File | undefined>(undefined);
@@ -16,6 +18,7 @@ const Index = () => {
   const [inferenceSteps, setInferenceSteps] = useState(20);
   const [randomSeed, setRandomSeed] = useState('1247');
   const [processing, setProcessing] = useState(false);
+  const [outputVideoUrl, setOutputVideoUrl] = useState<string | undefined>(undefined);
 
   const handleVideoUpload = (file: File) => {
     setVideoFile(file);
@@ -34,11 +37,15 @@ const Index = () => {
     }
 
     setProcessing(true);
+    setOutputVideoUrl(undefined);
     toast.info('Processing started. This might take a while...');
     
     // Simulate processing time
     setTimeout(() => {
       setProcessing(false);
+      // Create a fake output URL (in a real app, this would be a URL from your backend)
+      const fakeOutputUrl = URL.createObjectURL(videoFile);
+      setOutputVideoUrl(fakeOutputUrl);
       toast.success('Processing complete!');
     }, 3000);
   };
@@ -79,7 +86,7 @@ const Index = () => {
       </header>
 
       <main className="flex-1 p-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 grid grid-rows-2 gap-4 h-[600px]">
+        <div className="lg:col-span-2 grid grid-rows-3 gap-4 h-[900px]">
           <div className="relative border border-latent-border rounded-md bg-latent-lighter">
             <div className="absolute top-2 left-2 bg-latent-lighter px-2 py-1 rounded text-xs text-white flex items-center">
               <span className="mr-1">📷</span>
@@ -101,6 +108,16 @@ const Index = () => {
             </div>
             <div className="h-full">
               <UploadDropzone type="audio" onFileSelected={handleAudioUpload} />
+            </div>
+          </div>
+
+          <div className="relative border border-latent-border rounded-md bg-latent-lighter">
+            <div className="absolute top-2 left-2 bg-latent-lighter px-2 py-1 rounded text-xs text-white flex items-center">
+              <span className="mr-1">🎞️</span>
+              Output Video
+            </div>
+            <div className="h-full">
+              <OutputVideo videoUrl={outputVideoUrl} isProcessing={processing} />
             </div>
           </div>
         </div>
@@ -126,26 +143,67 @@ const Index = () => {
           </div>
           
           <div className="border border-latent-border rounded-md bg-latent-lighter p-4">
+            <div className="mb-4">
+              <h2 className="text-white font-medium flex items-center">
+                <span className="mr-2">⚙️</span>
+                Model Parameters
+              </h2>
+              <p className="text-gray-400 text-xs mt-1">
+                Adjust these parameters to control the LatentSync model behavior
+              </p>
+            </div>
             <div className="space-y-6">
-              <div>
+              <div className="bg-latent p-3 rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <h3 className="text-sm text-white font-medium">Guidance Scale</h3>
+                    <div className="group relative ml-1">
+                      <Info size={14} className="text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-0 mb-2 w-64 p-2 bg-black rounded-md text-xs text-gray-300 hidden group-hover:block shadow-lg z-10">
+                        Controls how closely the model follows the audio input. Higher values create more accurate lip sync but may reduce video quality.
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-sm text-white font-medium">{guidanceScale.toFixed(1)}</span>
+                </div>
                 <CustomSlider
-                  label="Guidance Scale"
+                  label=""
                   min={1}
                   max={2.5}
                   value={guidanceScale}
                   onChange={setGuidanceScale}
                 />
+                <div className="flex justify-between mt-1">
+                  <span className="text-xs text-gray-400">Less accurate (1.0)</span>
+                  <span className="text-xs text-gray-400">More accurate (2.5)</span>
+                </div>
               </div>
               
-              <div>
+              <div className="bg-latent p-3 rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <h3 className="text-sm text-white font-medium">Inference Steps</h3>
+                    <div className="group relative ml-1">
+                      <Info size={14} className="text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-0 mb-2 w-64 p-2 bg-black rounded-md text-xs text-gray-300 hidden group-hover:block shadow-lg z-10">
+                        Number of denoising steps. Higher values provide better quality but increase processing time.
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-sm text-white font-medium">{inferenceSteps}</span>
+                </div>
                 <CustomSlider
-                  label="Inference Steps"
+                  label=""
                   min={10}
                   max={50}
                   step={1}
                   value={inferenceSteps}
                   onChange={setInferenceSteps}
                 />
+                <div className="flex justify-between mt-1">
+                  <span className="text-xs text-gray-400">Faster (10)</span>
+                  <span className="text-xs text-gray-400">Better quality (50)</span>
+                </div>
               </div>
               
               <RandomSeed 
