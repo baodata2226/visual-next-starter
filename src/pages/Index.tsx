@@ -164,22 +164,6 @@ const Index = () => {
           </div>
         </div>
       </main>
-      
-      <footer className="p-4 border-t border-latent-border text-center text-gray-400 text-sm flex justify-between">
-        <div>
-          <a href="#" className="text-latent-orange hover:underline">
-            Use via API ✍️
-          </a>
-        </div>
-        <div>
-          <span>•</span> Built with Gradio <span className="text-yellow-500">😊</span> <span>•</span>
-        </div>
-        <div>
-          <a href="#" className="text-latent-orange hover:underline">
-            Settings ⚙️
-          </a>
-        </div>
-      </footer>
     </div>
   );
 };
